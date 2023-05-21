@@ -9,6 +9,7 @@ metadata:
     ingress.kubernetes.io/proxy-send-timeout: "30"
     kubernetes.io/ingress.class: nginx
 spec:
+  ingressClassName: public
   rules:
   - host: minio.127.0.0.1.nip.io
     http:
