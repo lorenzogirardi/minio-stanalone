@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  # This name uniquely identifies the Deployment
+  name: minio-deployment
+  namespace: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        # Label is used as selector in the service.
+        app: minio
+    spec:
+      # Refer to the PVC created earlier
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          # Name of the PVC created earlier
+          claimName: minio-pv-claim
+      containers:
+      - name: minio
+        # Pulls the default Minio image from Docker Hub
+        image: minio/minio:latest
+        args:
+        - server
+        - /storage
+        - --console-address
+        - ":9001"
+        env:
+        # Minio access key and secret key
+        - name: MINIO_ACCESS_KEY
+          value: "talentgarden"
+        - name: MINIO_SECRET_KEY
+          value: "ctDs4aGvRcVx8"
+        - name: MINIO_DOMAIN
+          value: minio.127.0.0.1.nip.io
+        ports:
+        - containerPort: 9000
+          name: api
+        - containerPort: 9001
+          name: console
+        # Mount the volume into the pod
+        volumeMounts:
+        - name: storage # must match the volume name, above
+          mountPath: "/storage"
